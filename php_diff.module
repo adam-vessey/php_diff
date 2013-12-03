@@ -1,0 +1,50 @@
+<?php
+
+function php_diff_menu() {
+  $items = array();
+
+  $items['php-diff'] = array(
+    'title' => 'PHP Diff',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('php_diff_form'),
+    'access callback' => TRUE,
+  );
+
+  return $items;
+}
+
+function php_diff_form($form, &$form_state) {
+  $lib_path = libraries_get_path('php-diff');
+  require_once "$lib_path/lib/Diff.php";
+  require_once "$lib_path/lib/Diff/Renderer/Html/Inline.php";
+
+  $form['alpha'] = array(
+    '#title' => t('Old'),
+    '#type' => 'textarea',
+  );
+
+  $form['bravo'] = array(
+    '#title' => t('New'),
+    '#type' => 'textarea',
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Submit'),
+  );
+
+  if (isset($form_state['input']['alpha']) && isset($form_state['input']['bravo'])) {
+    $diff = new Diff(explode("\n", $form_state['input']['alpha']), explode("\n", $form_state['input']['bravo']));
+    $renderer = new Diff_Renderer_Html_Inline();
+    $renderer->diff = $diff;
+    $form['thing'] = array(
+      '#markup' => $renderer->render(),
+    );
+  }
+
+  return $form;
+}
+
+function php_diff_form_submit(&$form, &$form_state) {
+  $form_state['rebuild'] = TRUE;
+}

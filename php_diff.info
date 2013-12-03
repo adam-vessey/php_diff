@@ -1,0 +1,5 @@
+name = PHP Diff
+description = "php-diff integration"
+version = 7.x-dev
+core = 7.x
+dependencies[] = libraries
